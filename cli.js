@@ -27,6 +27,7 @@ const cli = meow(`
 	Run without arguments to use the interactive mode.
 	In interactive mode, 🚦n% indicates high CPU usage and 🐏n% indicates high memory usage.
 	Supports fuzzy search in the interactive mode.
+	Identically named processes are grouped; open a group to choose one, several, or all.
 
 	The process name is case-insensitive by default.
 `, {
