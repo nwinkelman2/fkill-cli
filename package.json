@@ -23,7 +23,8 @@
 	},
 	"files": [
 		"cli.js",
-		"interactive.js"
+		"interactive.js",
+		"process-groups.js"
 	],
 	"keywords": [
 		"cli-app",

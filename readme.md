@@ -44,6 +44,7 @@ $ fkill --help
 	Run without arguments to use the interactive interface.
 	In interactive mode, 🚦n% indicates high CPU usage and 🐏n% indicates high memory usage.
 	Supports fuzzy search in the interactive mode.
+	Identically named processes are grouped; open a group to choose one, several, or all.
 
 	The process name is case-insensitive by default.
 ```
@@ -51,6 +52,8 @@ $ fkill --help
 ## Interactive UI
 
 Run `fkill` without arguments to launch the interactive UI.
+
+Processes with the same name are collapsed into one entry. Open that entry to select individual processes with <kbd>Space</kbd>, or press <kbd>A</kbd> to toggle all matching processes before confirming.
 
 ![](screenshot.svg)
 

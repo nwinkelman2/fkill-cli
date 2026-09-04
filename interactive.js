@@ -10,6 +10,7 @@ import {allPortsWithPid} from 'pid-port';
 import fkill from 'fkill';
 import {processExists} from 'process-exists';
 import FuzzySearch from 'fuzzy-search';
+import {collapseDuplicateProcessChoices, resolveProcessSelection} from './process-groups.js';
 
 const isWindows = process.platform === 'win32';
 const commandLineMargins = 4;
@@ -255,17 +256,19 @@ const listProcesses = async (processes, flags) => {
 	const memoryThreshold = flags.verbose ? 0 : 1;
 	const cpuThreshold = flags.verbose ? 0 : 3;
 	const searcher = new FuzzySearch(processes, ['name'], {caseSensitive: false});
+	const renderProcess = process_ => renderProcessForDisplay(process_, flags, memoryThreshold, cpuThreshold);
 
-	const selectedPid = await search({
+	const selection = await search({
 		message: 'Running processes:',
 		pageSize: 10,
 		async source(term = '') {
 			const matchingProcesses = filterAndSortProcesses(processes, term, searcher, flags);
-			return matchingProcesses.map(process_ => renderProcessForDisplay(process_, flags, memoryThreshold, cpuThreshold));
+			return collapseDuplicateProcessChoices(matchingProcesses, renderProcess);
 		},
 	});
 
-	performKillSequence(selectedPid);
+	const selectedPids = await resolveProcessSelection(selection, renderProcess, inquirer.prompt);
+	await performKillSequence(selectedPids);
 };
 
 const init = async flags => {
