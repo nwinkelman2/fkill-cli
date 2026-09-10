@@ -32,20 +32,48 @@ test('single-process selection needs no submenu', async t => {
 	t.false(promptCalled);
 });
 
-test('process group supports selecting any subset or all', async t => {
+test('process group offers an explicit kill-all action', async t => {
 	const group = collapseDuplicateProcessChoices([
 		{name: 'node', pid: 11, ports: []},
 		{name: 'node', pid: 22, ports: []},
 	], renderTestProcess)[0].value;
-	let promptQuestion;
+	let actionQuestion;
+	let promptCalls = 0;
 	const selection = await resolveProcessSelection(group, renderTestProcess, async questions => {
-		[promptQuestion] = questions;
-		return {processes: [11, 22]};
+		promptCalls++;
+		[actionQuestion] = questions;
+		return {action: 'kill-all'};
 	});
 
-	t.is(promptQuestion.type, 'checkbox');
-	t.deepEqual(promptQuestion.choices.map(choice => choice.value), [11, 22]);
-	t.truthy(promptQuestion.validate([11]));
-	t.is(promptQuestion.validate([]), 'Select at least one process.');
+	t.is(promptCalls, 1);
+	t.is(actionQuestion.type, 'list');
+	t.deepEqual(actionQuestion.choices.map(choice => choice.value), ['kill-all', 'choose-individual']);
+	t.regex(actionQuestion.choices[0].name, /^Kill all 2 node processes$/);
 	t.deepEqual(selection, [11, 22]);
+});
+
+test('process group can choose an individual subset', async t => {
+	const group = collapseDuplicateProcessChoices([
+		{name: 'node', pid: 11, ports: []},
+		{name: 'node', pid: 22, ports: []},
+	], renderTestProcess)[0].value;
+	let promptCalls = 0;
+	let checkboxQuestion;
+	const selection = await resolveProcessSelection(group, renderTestProcess, async questions => {
+		promptCalls++;
+		const [question] = questions;
+		if (promptCalls === 1) {
+			return {action: 'choose-individual'};
+		}
+
+		checkboxQuestion = question;
+		return {processes: [22]};
+	});
+
+	t.is(promptCalls, 2);
+	t.is(checkboxQuestion.type, 'checkbox');
+	t.deepEqual(checkboxQuestion.choices.map(choice => choice.value), [11, 22]);
+	t.truthy(checkboxQuestion.validate([22]));
+	t.is(checkboxQuestion.validate([]), 'Select at least one process.');
+	t.deepEqual(selection, [22]);
 });
