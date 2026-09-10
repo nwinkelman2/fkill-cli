@@ -26,6 +26,26 @@ const resolveProcessSelection = async (selection, renderProcess, prompt) => {
 		return [selection];
 	}
 
+	const actionAnswer = await prompt([{
+		type: 'list',
+		name: 'action',
+		message: `${selection.processes.length} ${selection.name} processes found:`,
+		choices: [
+			{
+				name: `Kill all ${selection.processes.length} ${selection.name} processes`,
+				value: 'kill-all',
+			},
+			{
+				name: 'Choose individual processes',
+				value: 'choose-individual',
+			},
+		],
+	}]);
+
+	if (actionAnswer.action === 'kill-all') {
+		return selection.processes.map(process_ => process_.pid);
+	}
+
 	const answer = await prompt([{
 		type: 'checkbox',
 		name: 'processes',
