@@ -53,7 +53,7 @@ $ fkill --help
 
 Run `fkill` without arguments to launch the interactive UI.
 
-Processes with the same name are collapsed into one entry. Open that entry to select individual processes with <kbd>Space</kbd>, or press <kbd>A</kbd> to toggle all matching processes before confirming.
+Processes with the same name are collapsed into one entry. Open that entry to choose **Kill all** for the displayed group or **Choose individual processes**. In the individual selection list, press <kbd>Space</kbd> to toggle a process or <kbd>A</kbd> to toggle all displayed processes before confirming.
 
 ![](screenshot.svg)
 
